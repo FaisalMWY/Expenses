@@ -10,13 +10,19 @@ import AllExpneses from './screens/AllExpenses';
 import RecentExpenses from './screens/RecentExpenses';
 import {GlobalStyles} from './constants/styles';
 import IconButton from './components/UI/IconButton';
-
+import ExpensesContextProvider, {
+  ExpensesContext,
+} from './store/expenses-context';
+/* Stack and BottomTabs are declared here for a cleaner code, addetionally both navigators are
+isensial to use and configure stack and bottom tab navagators */
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
+/* ExpensesOverview was made here for a cleaner code as well, as it is quite different from the other pages
+, this is a page with two pages within */
 function ExpensesOverview() {
   return (
     <BottomTabs.Navigator
-      screenOptions={{
+      screenOptions={({navigation}) => ({
         headerStyle: {backgroundColor: GlobalStyles.colors.primary500},
         headerTintColor: 'white',
         tabBarStyle: {backgroundColor: GlobalStyles.colors.primary500},
@@ -26,10 +32,12 @@ function ExpensesOverview() {
             icon="add"
             size={24}
             color={tintColor}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate('ManageExpense');
+            }}
           />
         ),
-      }}>
+      })}>
       <BottomTabs.Screen
         name="RecentExpenses"
         component={RecentExpenses}
@@ -37,7 +45,7 @@ function ExpensesOverview() {
           title: 'Recent Expenses',
           tabBarLabel: 'Recent',
           tabBarIcon: ({color, size}) => (
-            <Ionicon name="calendar" size={size} color={color} />
+            <Ionicon name="hourglass" size={size} color={color} />
           ),
         }}
       />
@@ -48,7 +56,7 @@ function ExpensesOverview() {
           title: 'All Expenses',
           tabBarLabel: 'All Expenses',
           tabBarIcon: ({color, size}) => (
-            <Ionicon name="hourglass" size={size} color={color} />
+            <Ionicon name="calendar" size={size} color={color} />
           ),
         }}
       />
@@ -60,16 +68,28 @@ function App() {
   return (
     <>
       <StatusBar />
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="ExpensesOverview"
-            component={ExpensesOverview}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen name="ManageExpense" component={ManageExpense} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <ExpensesContextProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: GlobalStyles.colors.primary500,
+                headerTintColor: 'white',
+              },
+            }}>
+            <Stack.Screen
+              name="ExpensesOverview"
+              component={ExpensesOverview}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="ManageExpense"
+              component={ManageExpense}
+              options={{presentation: 'modal', headerTintColor: 'white'}}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ExpensesContextProvider>
     </>
   );
 }
